@@ -6018,7 +6018,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
             initializeCountryCode();
 
             setRandomMacOui();
-            mWifiNative.enableAutoConnect(false);
+            mWifiNative.enableAutoConnect(true);
         }
 
         @Override
