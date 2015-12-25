@@ -5301,6 +5301,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
             Log.d(TAG, "SoftAp config channel is: " + config.apChannel);
         }
 
+	if (true) { // simple wifi ap channel select
+            boolean dualBand = mContext.getResources().getBoolean(com.android.internal.R.bool.config_wifi_dual_band_support);
+            //Log.d(TAG, "dualBand = " + dualBand + ", apBand = " + config.apBand);
+            if (dualBand && config.apBand != 0) {
+                config.apChannel = 153;
+            } else {
+                config.apChannel = 6;
+            }
+            Log.d(TAG, "SoftAp config channel is: " + config.apChannel);
+	} else {
         //We need HAL support to set country code and get available channel list, if HAL is
         //not available, like razor, we regress to original implementaion (2GHz, channel 6)
         if (mWifiNative.isHalStarted()) {
@@ -5345,6 +5355,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
             config.apBand = 0;
             config.apChannel = 6;
         }
+	}
         // Start hostapd on a separate thread
         new Thread(new Runnable() {
             public void run() {
