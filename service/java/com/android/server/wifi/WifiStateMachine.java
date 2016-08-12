@@ -123,6 +123,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -2638,6 +2639,37 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
         pw.println();
         mWifiLogger.captureBugReportData(WifiLogger.REPORT_REASON_USER_ACTION);
         mWifiLogger.dump(fd, pw, args);
+    }
+
+    public boolean checkIfSupportDualBand() {
+        File file = new File("/sys/class/rkwifi/chip");
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String tempString = null;
+            while ((tempString = reader.readLine()) != null) {
+                Log.d(TAG, "Get wifi chip name: " + tempString);
+                if (tempString.contains("AP6234") || tempString.contains("AP6330")
+                    || tempString.contains("AP6335") || tempString.contains("AP6354")
+                    || tempString.contains("AP6441")) {
+                    reader.close();
+                    return true;
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -5303,7 +5335,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
         }
 
 	if (true) { // simple wifi ap channel select
-            boolean dualBand = mContext.getResources().getBoolean(com.android.internal.R.bool.config_wifi_dual_band_support);
+            boolean dualBand = mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_wifi_dual_band_support) || checkIfSupportDualBand();
             //Log.d(TAG, "dualBand = " + dualBand + ", apBand = " + config.apBand);
             if (dualBand && config.apBand != 0) {
                 config.apChannel = 153;
