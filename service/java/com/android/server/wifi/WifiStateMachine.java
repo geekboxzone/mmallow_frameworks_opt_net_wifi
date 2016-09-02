@@ -9467,9 +9467,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                         // not be processed) and restart the scan
                         int period =  mWifiConfigStore.wifiDisconnectedShortScanIntervalMilli.get();
                         if (mP2pConnected.get()) {
+                           long defaultInterval = 1800000;//30 mins if p2p connected
                            period = (int)Settings.Global.getLong(mContext.getContentResolver(),
                                     Settings.Global.WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS,
-                                    period);
+                                    defaultInterval);
                         }
                         if (!checkAndRestartDelayedScan(message.arg2,
                                 true, period, null, null)) {
